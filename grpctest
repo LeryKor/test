@@ -1,0 +1,61 @@
+import grpc
+import stt_pb2
+import stt_pb2_grpc
+
+# Создаем канал для соединения с сервером (замени "your_grpc_server:port" на актуальный адрес)
+channel = grpc.insecure_channel("your_grpc_server:port")
+stub = stt_pb2_grpc.STTStub(channel)  # Исправлено на корректное имя сервиса
+
+# Читаем аудиофайл
+with open("audio.wav", "rb") as audio_file:
+    audio_data = audio_file.read()
+
+# Формируем конфигурацию запроса
+config = stt_pb2.RecognitionConfig(
+    encoding=stt_pb2.AudioEncoding.LINEAR_PCM,
+    sample_rate_hertz=16000,
+    language_code="ru-RU",
+    audio_channel_count=1,
+    split_by_channel=False,
+    model="default",
+    enable_word_time_offsets=False,
+    va_config=stt_pb2.VoiceActivityConfig(
+        voice_activity_detection_algorithm=stt_pb2.VoiceActivityConfig.VoiceActivityDetectionAlgorithmUsage.USE_VAD
+    ),
+    va_response_mode=stt_pb2.RecognitionConfig.VoiceActivityMarkEventsMode.VA_DISABLE,
+    genderage_config=stt_pb2.SpeakerGenderAgePrediction(
+        gender=stt_pb2.SpeakerGenderAgePrediction.GenderClass.GENDER_UNDEF,
+        age=stt_pb2.SpeakerGenderAgePrediction.AgeClass.AGE_UNDEF,
+        emotion=stt_pb2.SpeakerGenderAgePrediction.EmotionsRecognition(
+            positive=0.0,
+            neutral=0.0,
+            negative_angry=0.0,
+            negative_sad=0.0
+        )
+    ),
+    antispoofing_config=stt_pb2.SpoofingResult(
+        type=stt_pb2.SpoofingResult.AttackType.ATTACK_DETECTED,
+        result=stt_pb2.SpoofingResult.AttackResult.GENUINE,
+        confidence=0.0,
+        start_time_ms=0,
+        end_time_ms=0
+    ),
+    context_dictionary=stt_pb2.ContextDictionaryConfig(),
+    punctuation_config=stt_pb2.PunctuationConfig(),
+    denormalization_config=stt_pb2.DenormalizationConfig(),
+    speaker_labeling_config=stt_pb2.SpeakerInfo(
+        speaker_id=0
+    )
+)
+
+# Формируем запрос
+request = stt_pb2.FileRecognizeRequest(
+    config=config,
+    audio=audio_data
+)
+
+# Отправляем запрос
+response = stub.FileRecognize(request)  # Исправлено на корректный метод
+
+# Выводим результат
+print(response)
