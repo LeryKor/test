@@ -19,9 +19,7 @@ config = stt_pb2.RecognitionConfig(
     split_by_channel=False,
     model="default",
     enable_word_time_offsets=False,
-    va_config=stt_pb2.VoiceActivityConfig(
-        voice_activity_detection_algorithm=stt_pb2.VoiceActivityConfig.VoiceActivityDetectionAlgorithmUsage.USE_VAD
-    ),
+    va_config=stt_pb2.VoiceActivityConfig(),
     va_response_mode=stt_pb2.RecognitionConfig.VoiceActivityMarkEventsMode.VA_DISABLE,
     genderage_config=stt_pb2.SpeakerGenderAgePrediction(
         gender=stt_pb2.SpeakerGenderAgePrediction.GenderClass.GENDER_UNDEF,
